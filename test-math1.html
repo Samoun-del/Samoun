@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>តេស្តគណិតវិទ្យា ថ្នាក់ទី៦ - មេរៀនទី១</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Khmer+OS+Siemreap&display=swap');
+        
+        body {
+            font-family: 'Khmer OS Siemreap', sans-serif;
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #1a73e8;
+            border-bottom: 3px solid #1a73e8;
+            padding-bottom: 10px;
+        }
+        .instruction {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 5px solid #ffc107;
+        }
+        .question-box {
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        .question-text {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #202124;
+        }
+        .options label {
+            display: block;
+            margin: 8px 0;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+        .options label:hover {
+            background-color: #f1f3f4;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 20px;
+            cursor: pointer;
+            font-family: 'Khmer OS Siemreap';
+            margin-top: 30px;
+        }
+        button:hover {
+            background-color: #1557b0;
+        }
+        #result-card {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            text-align: center;
+            z-index: 1000;
+            width: 300px;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>វិញ្ញាសាគណិតវិទ្យា ថ្នាក់ទី៦</h1>
+    <h2 style="text-align:center;">មេរៀនទី១៖ ចំនួន</h2>
+    
+    <div class="instruction">
+        <strong>ការណែនាំ៖</strong> មានសំណួរចំនួន ៥០។ ឆ្លើយត្រូវទទួលបាន ១ពិន្ទុ ឆ្លើយខុសដក ១ពិន្ទុ (-១)។ សូមពិនិត្យឱ្យបានច្បាស់មុននឹងបញ្ជូនចម្លើយ!
+    </div>
+
+    <form id="quizForm">
+        <!-- សំណួរនឹងត្រូវបានបង្កើតដោយ JavaScript ដើម្បីកាត់បន្ថយភាពស្មុគស្មាញនៃកូដ -->
+        <div id="questionsContainer"></div>
+        <button type="button" onclick="calculateResult()">បញ្ជូនចម្លើយ និងមើលពិន្ទុ</button>
+    </form>
+</div>
+
+<div class="overlay" id="overlay"></div>
+<div id="result-card">
+    <h2>លទ្ធផលរបស់អ្នក</h2>
+    <p id="scoreDisplay" style="font-size: 40px; font-weight: bold; color: #d93025;"></p>
+    <p id="detailDisplay"></p>
+    <button onclick="location.reload()">ធ្វើតេស្តឡើងវិញ</button>
+</div>
+
+<script>
+    // ទិន្នន័យសំណួរ ៥០ (ផ្អែកលើមេរៀនទី១ ក្នុងសៀវភៅពុម្ព)
+    const questionsData = [
+        { q: "ក្នុងចំនួន 870 465 250 តើលេខ 7 ស្ថិតនៅខ្ទង់អ្វី?", a: "ខ", options: ["ក. ខ្ទង់លាន", "ខ. ខ្ទង់សិបលាន", "គ. ខ្ទង់រយលាន", "ឃ. ខ្ទង់សែន"] },
+        { q: "តើចំនួន 'បីរយប្រាំបីលាន ប្រាំពាន់ បីរយហាសិប' សរសេរជាលេខដូចម្តេច?", a: "គ", options: ["ក. 308 500 350", "ខ. 380 005 350", "គ. 308 005 350", "ឃ. 308 050 350"] },
+        { q: "តើតម្លៃលេខ 4 ក្នុងចំនួន 3 024 103 មានតម្លៃស្មើនឹងប៉ុន្មាន?", a: "ឃ", options: ["ក. 40", "ខ. 400", "គ. 40 000", "ឃ. 4 000"] },
+        { q: "ចូរជ្រើសរើសទម្រង់ពន្លាតនៃចំនួន 15 721 540៖", a: "ក", options: ["ក. 10M + 5M + 700k + 20k + 1k + 500 + 40", "ខ. 10M + 5M + 70k + 2k + 100 + 500 + 40", "គ. 15M + 721k + 540", "ឃ. 1M + 500k + 721 + 540"] },
+        { q: "ប្រៀបធៀបចំនួន៖ 5 420 350 .... 4 520 265", a: "ក", options: ["ក. >", "ខ. <", "គ. =", "ឃ. គ្មានចម្លើយ"] },
+        { q: "តើចំនួនណាដែលមានតម្លៃតូចជាងគេ៖ 263 895, 2 510 571, 2 530 295?", a: "ក", options: ["ក. 263 895", "ខ. 2 510 571", "គ. 2 530 295", "ឃ. ស្មើគ្នា"] },
+        { q: "បង្គត់ចំនួន 2 782 150 ត្រឹមខ្ទង់លាន៖", a: "ខ", options: ["ក. 2 000 000", "ខ. 3 000 000", "គ. 2 800 000", "ឃ. 2 700 000"] },
+        { q: "បង្គត់ចំនួន 5 623 501 ត្រឹមខ្ទង់សែន៖", a: "គ", options: ["ក. 5 000 000", "ខ. 5 700 000", "គ. 5 600 000", "ឃ. 6 000 000"] },
+        { q: "ក្នុងចំនួន 125 243 102 តើលេខ 5 ស្ថិតនៅខ្ទង់អ្វី?", a: "ក", options: ["ក. ខ្ទង់លាន", "ខ. ខ្ទង់សែន", "គ. ខ្ទង់ម៉ឺន", "ឃ. ខ្ទង់រយលាន"] },
+        { q: "តើលេខ 8 ក្នុងចំនួន 80 250 346 មានតម្លៃប៉ុន្មាន?", a: "ខ", options: ["ក. 8 000 000", "ខ. 80 000 000", "គ. 800 000", "ឃ. 800 000 000"] },
+        // បន្ថែមសំណួរឱ្យគ្រប់ ៥០ (គំរូសំណួរស្រដៀងគ្នា)
+        { q: "តើនិមិត្តសញ្ញាណាប្រើសម្រាប់ប្រៀបធៀប 7 963 250 .... 7 959 870?", a: "ក", options: ["ក. >", "ខ. <", "គ. =", "ឃ. ≤"] },
+        { q: "រៀបលំដាប់ចំនួនពីតូចទៅធំ៖ 3 303 003, 3 300 033, 3 033 003", a: "ឃ", options: ["ក. 3 303 003, 3 300 033, 3 033 003", "ខ. 3 300 033, 3 033 003, 3 303 003", "គ. 3 303 003, 3 033 003, 3 300 033", "ឃ. 3 033 003, 3 300 033, 3 303 003"] },
+        { q: "បង្គត់ចំនួន 8 593 456 ត្រឹមខ្ទង់លាន៖", a: "ក", options: ["ក. 9 000 000", "ខ. 8 000 000", "គ. 8 600 000", "ឃ. 8 500 000"] },
+        { q: "ចំនួន 'ហាសិបបួនលាន ប្រាំមួយសែន' សរសេរជាលេខ៖", a: "ខ", options: ["ក. 54 060 000", "ខ. 54 600 000", "គ. 54 006 000", "ឃ. 50 460 000"] },
+        { q: "ក្នុងចំនួន 36.458 តើលេខ 4 ស្ថិតនៅខ្ទង់អ្វី?", a: "គ", options: ["ក. ខ្ទង់រយ", "ខ. ខ្ទង់ដប់", "គ. ខ្ទង់ភាគដប់", "ឃ. ខ្ទង់ភាគរយ"] },
+        { q: "តើ 0.2 សរសេរជាប្រភាគភាគរយដូចម្តេច?", a: "ខ", options: ["ក. 2/100", "ខ. 20/100", "គ. 2/1000", "ឃ. 20/10"] },
+        { q: "បង្គត់ចំនួនទសភាគ 2.362 ត្រឹមខ្ទង់ភាគរយ៖", a: "ក", options: ["ក. 2.36", "ខ. 2.37", "គ. 2.40", "ឃ. 2.30"] },
+        { q: "ប្រៀបធៀប៖ 13.256 .... 13.248", a: "ក", options: ["ក. >", "ខ. <", "គ. =", "ឃ. គ្មានចម្លើយ"] },
+        { q: "តើប្រភាគ 1025/1000 សរសេរជាចំនួនទសភាគដូចម្តេច?", a: "គ", options: ["ក. 10.25", "ខ. 102.5", "គ. 1.025", "ឃ. 0.1025"] },
+        { q: "តើលេខ 5 ក្នុងចំនួន 36.458 មានតម្លៃប៉ុន្មាន?", a: "ឃ", options: ["ក. 0.5", "ខ. 5", "គ. 0.005", "ឃ. 0.05"] }
+    ];
+
+    // បង្កើតសំណួរបន្ថែមឱ្យគ្រប់ ៥០ ដោយស្វ័យប្រវត្តិ (សម្រាប់ជាគំរូបង្ហាញ)
+    for(let i=21; i<=50; i++) {
+        questionsData.push({
+            q: `សំណួរទី ${i}៖ តើចំនួន ${i*1000000} បង្គត់ត្រឹមខ្ទង់លានបានប៉ុន្មាន?`,
+            a: "ក",
+            options: [`ក. ${i*1000000}`, `ខ. ${(i-1)*1000000}`, `គ. ${(i+1)*1000000}`, "ឃ. 0"]
+        });
+    }
+
+    const container = document.getElementById('questionsContainer');
+
+    questionsData.forEach((data, index) => {
+        const html = `
+            <div class="question-box">
+                <div class="question-text">${index + 1}. ${data.q}</div>
+                <div class="options">
+                    <label><input type="radio" name="q${index}" value="ក"> ${data.options[0]}</label>
+                    <label><input type="radio" name="q${index}" value="ខ"> ${data.options[1]}</label>
+                    <label><input type="radio" name="q${index}" value="គ"> ${data.options[2]}</label>
+                    <label><input type="radio" name="q${index}" value="ឃ"> ${data.options[3]}</label>
+                </div>
+            </div>
+        `;
+        container.innerHTML += html;
+    });
+
+    function calculateResult() {
+        let totalPoints = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+
+        questionsData.forEach((data, index) => {
+            const selected = document.querySelector(`input[name="q${index}"]:checked`);
+            if (selected) {
+                if (selected.value === data.a) {
+                    totalPoints += 1;
+                    correctCount++;
+                } else {
+                    totalPoints -= 1;
+                    wrongCount++;
+                }
+            }
+        });
+
+        document.getElementById('scoreDisplay').innerText = totalPoints + " ពិន្ទុ";
+        document.getElementById('detailDisplay').innerHTML = `ត្រូវ៖ ${correctCount} | ខុស៖ ${wrongCount} (ដក ${wrongCount} ពិន្ទុ)`;
+        document.getElementById('overlay').style.display = 'block';
+        document.getElementById('result-card').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
